@@ -1,0 +1,296 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { QUESTIONS } from "@/lib/questions";
+import { score, type ScoreResult } from "@/lib/scoring";
+import { RESULTS, BRIDGE, MACRO_LABEL } from "@/lib/results";
+
+type Stage = "intro" | "quiz" | "result";
+
+const LINE_URL =
+  process.env.NEXT_PUBLIC_LINE_URL ?? "https://line.me/";
+const SAMPLE_URL = process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL ?? "";
+
+export default function Quiz() {
+  const [stage, setStage] = useState<Stage>("intro");
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [result, setResult] = useState<ScoreResult | null>(null);
+
+  const total = QUESTIONS.length;
+  const q = QUESTIONS[step];
+
+  function choose(optIdx: number) {
+    const next = { ...answers, [q.id]: optIdx };
+    setAnswers(next);
+    if (step + 1 < total) {
+      setStep(step + 1);
+    } else {
+      const r = score(next);
+      setResult(r);
+      setStage("result");
+      // best-effort store; never blocks the UI
+      fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: next, scores: r.scores, type: r.type }),
+      }).catch(() => {});
+    }
+  }
+
+  function back() {
+    if (step > 0) setStep(step - 1);
+  }
+
+  function restart() {
+    setAnswers({});
+    setStep(0);
+    setResult(null);
+    setStage("intro");
+  }
+
+  return (
+    <main className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col px-5 py-8 sm:py-12">
+      {stage === "intro" && <Intro onStart={() => setStage("quiz")} />}
+      {stage === "quiz" && (
+        <QuizStep
+          key={q.id}
+          step={step}
+          total={total}
+          question={q}
+          selected={answers[q.id]}
+          onChoose={choose}
+          onBack={back}
+        />
+      )}
+      {stage === "result" && result && (
+        <Result result={result} onRestart={restart} />
+      )}
+    </main>
+  );
+}
+
+/* ---------------- Intro ---------------- */
+function Intro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="flex flex-1 flex-col justify-center">
+      <p className="animate-fadeUp font-sans text-sm tracking-widest text-teal">
+        DIET PFC CHECK
+      </p>
+      <h1 className="animate-fadeUp font-display text-3xl font-bold leading-snug text-ink sm:text-4xl [animation-delay:80ms]">
+        あなたが<br />
+        <span className="relative inline-block">
+          <span className="relative z-10">“摂りすぎ”ている</span>
+          <span className="absolute inset-x-0 bottom-1 z-0 h-3 bg-sand/50" />
+        </span>
+        <br />
+        栄養素は？
+      </h1>
+      <p className="mt-6 animate-fadeUp font-sans text-base leading-relaxed text-ink/80 [animation-delay:160ms]">
+        10問・約60秒。タップで答えるだけ。
+        <br />
+        ダイエットがうまくいかなかった
+        <span className="font-medium text-ink">本当の理由</span>
+        が、PFC（たんぱく質・脂質・糖質）から見えてきます。
+      </p>
+
+      <button
+        onClick={onStart}
+        className="mt-10 animate-fadeUp rounded-full bg-teal px-8 py-4 font-sans text-base font-bold text-cream shadow-lg shadow-teal/20 transition hover:bg-tealDark active:scale-[0.98] [animation-delay:240ms]"
+      >
+        診断をはじめる
+      </button>
+      <p className="mt-4 animate-fadeUp font-sans text-xs text-muted [animation-delay:300ms]">
+        ※ 登録などは不要です。結果はその場で表示されます。
+      </p>
+    </div>
+  );
+}
+
+/* ---------------- Question ---------------- */
+function QuizStep({
+  step,
+  total,
+  question,
+  selected,
+  onChoose,
+  onBack,
+}: {
+  step: number;
+  total: number;
+  question: (typeof QUESTIONS)[number];
+  selected: number | undefined;
+  onChoose: (i: number) => void;
+  onBack: () => void;
+}) {
+  const pct = Math.round(((step + 1) / total) * 100);
+  return (
+    <div className="flex flex-1 flex-col">
+      {/* progress */}
+      <div className="mb-8">
+        <div className="mb-2 flex items-center justify-between font-sans text-xs text-muted">
+          <button
+            onClick={onBack}
+            disabled={step === 0}
+            className="transition disabled:opacity-0"
+          >
+            ← 戻る
+          </button>
+          <span>
+            質問 {step + 1} <span className="text-line">/</span> {total}
+          </span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div
+            className="h-full rounded-full bg-teal transition-all duration-500 ease-out"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      <h2
+        key={question.id}
+        className="animate-fadeUp font-display text-xl font-semibold leading-relaxed text-ink sm:text-2xl"
+      >
+        {question.text}
+      </h2>
+
+      <div className="mt-7 flex flex-col gap-3">
+        {question.options.map((opt, i) => {
+          const active = selected === i;
+          return (
+            <button
+              key={i}
+              onClick={() => onChoose(i)}
+              className={[
+                "animate-fadeUp rounded-2xl border px-5 py-4 text-left font-sans text-[15px] leading-relaxed transition active:scale-[0.99]",
+                active
+                  ? "border-teal bg-teal text-cream"
+                  : "border-line bg-white/70 text-ink hover:border-teal/60 hover:bg-white",
+              ].join(" ")}
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Result ---------------- */
+function Result({
+  result,
+  onRestart,
+}: {
+  result: ScoreResult;
+  onRestart: () => void;
+}) {
+  const r = RESULTS[result.type];
+  const bars = useMemo(
+    () =>
+      (["C", "F", "P"] as const).map((m) => ({
+        m,
+        label: MACRO_LABEL[m],
+        share: result.share[m],
+        dominant: m === result.type,
+      })),
+    [result]
+  );
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <p
+        className="animate-fadeUp font-sans text-sm tracking-widest"
+        style={{ color: r.accent }}
+      >
+        あなたのタイプは
+      </p>
+      <h1 className="mt-2 animate-fadeUp font-display text-3xl font-bold leading-snug text-ink sm:text-4xl [animation-delay:80ms]">
+        {r.label}
+      </h1>
+      <p className="mt-4 animate-fadeUp font-display text-lg text-ink/80 [animation-delay:140ms]">
+        {r.catch}
+      </p>
+
+      {/* tendency bars */}
+      <div className="mt-8 animate-fadeUp rounded-2xl border border-line bg-white/70 p-5 [animation-delay:200ms]">
+        <p className="mb-4 font-sans text-xs tracking-wide text-muted">
+          あなたの傾向（PFCの偏り）
+        </p>
+        <div className="flex flex-col gap-3.5">
+          {bars.map((b) => (
+            <div key={b.m} className="flex items-center gap-3">
+              <span className="w-16 shrink-0 font-sans text-sm text-ink">
+                {b.label}
+              </span>
+              <div className="h-3 flex-1 overflow-hidden rounded-full bg-cream">
+                <div
+                  className="h-full origin-left rounded-full"
+                  style={{
+                    width: `${Math.max(b.share, 4)}%`,
+                    backgroundColor: b.dominant ? r.accent : "#D9CFBE",
+                    animation: "grow 0.8s cubic-bezier(0.22,1,0.36,1) both",
+                  }}
+                />
+              </div>
+              {b.dominant && (
+                <span
+                  className="shrink-0 rounded-full px-2.5 py-0.5 font-sans text-xs font-bold text-white"
+                  style={{ backgroundColor: r.accent }}
+                >
+                  摂りすぎ
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 font-sans text-[11px] leading-relaxed text-muted">
+          ※ これはおおよその傾向です。正確な数値ではありません。
+        </p>
+      </div>
+
+      {/* body */}
+      <div className="mt-7 flex flex-col gap-4 animate-fadeUp [animation-delay:260ms]">
+        {r.body.map((p, i) => (
+          <p key={i} className="font-sans text-[15px] leading-relaxed text-ink/90">
+            {p}
+          </p>
+        ))}
+      </div>
+
+      {/* bridge + CTA */}
+      <div className="mt-9 animate-fadeUp rounded-3xl bg-teal p-6 text-cream [animation-delay:320ms]">
+        <p className="font-sans text-[15px] leading-relaxed">{BRIDGE}</p>
+
+        {SAMPLE_URL && (
+          <img
+            src={SAMPLE_URL}
+            alt="3日間レポートのサンプル"
+            className="mt-5 w-full rounded-xl border border-white/15"
+          />
+        )}
+
+        <a
+          href={LINE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 block rounded-full bg-cream px-6 py-4 text-center font-sans text-base font-bold text-teal transition hover:bg-white active:scale-[0.98]"
+        >
+          公式LINEで3日間レポートを受け取る
+        </a>
+        <p className="mt-3 text-center font-sans text-xs text-cream/70">
+          あなた専用のカロリー＆PFCレポートを無料でお返しします
+        </p>
+      </div>
+
+      <button
+        onClick={onRestart}
+        className="mx-auto mt-8 font-sans text-sm text-muted underline-offset-4 transition hover:underline"
+      >
+        もう一度診断する
+      </button>
+    </div>
+  );
+}
