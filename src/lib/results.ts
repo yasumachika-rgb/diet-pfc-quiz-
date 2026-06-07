@@ -85,5 +85,5 @@ export const BRIDGE =
 export const MACRO_LABEL: Record<Macro, string> = {
   P: "たんぱく質",
   F: "脂質",
-  C: "糖質",
+  C: "炭水化物",
 };

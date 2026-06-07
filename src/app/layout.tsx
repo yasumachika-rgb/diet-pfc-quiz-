@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "あなたに合う痩せ方診断",
   description:
-    "10問・約60秒。タップで答えるだけ。あなたに合う痩せ方が、PFC（たんぱく質・脂質・糖質）の傾向から見えてきます。",
+    "10問・約60秒。タップで答えるだけ。あなたに合う痩せ方が、PFC（たんぱく質・脂質・炭水化物）の傾向から見えてきます。",
   openGraph: {
     title: "あなたに合う痩せ方診断",
     description: "10問・約60秒の痩せ方タイプ診断。",
@@ -27,7 +27,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>

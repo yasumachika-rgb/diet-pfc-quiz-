@@ -5,16 +5,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        canvas: "#F3F3F5",     // ページ背景（薄グレー）
         ink: "#545454",        // 文字
         accent: "#D0BDFF",     // 指し色
-        accentSoft: "#F4F0FF", // 指し色の薄い背景
-        accentDeep: "#6B53B8", // 読みやすさ用の濃い紫（要所のみ）
+        accentSoft: "#F4F0FF",
+        accentDeep: "#6B53B8", // 濃い紫（タイトル・ボタン）
         muted: "#9B9B9B",
-        line: "#ECE9F2",
+        line: "#ECECEF",
       },
       fontFamily: {
-        display: ['"Shippori Mincho"', "serif"],
-        sans: ['"Zen Kaku Gothic New"', "sans-serif"],
+        display: ['"Zen Maru Gothic"', "sans-serif"],   // 丸ゴシック（やわらかい）
+        sans: ['"Zen Kaku Gothic New"', "sans-serif"],  // 角ゴシック（本文）
       },
       keyframes: {
         fadeUp: {
