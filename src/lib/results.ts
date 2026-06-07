@@ -80,7 +80,7 @@ export const RESULTS: Record<Macro, ResultContent> = {
 };
 
 export const BRIDGE =
-  "でも、これはあくまで“おおよその傾向”です。あなたの実際の数字（カロリーとPFCバランス）は、3日間の食事を見ればはっきり分かります。";
+  "でも、これはあくまで“およその傾向”です。あなたの実際の数字（カロリーとPFCバランス）は、3日間の食事を見れば【あなたに合う痩せ方】がより具体的にわかります";
 
 export const MACRO_LABEL: Record<Macro, string> = {
   P: "たんぱく質",

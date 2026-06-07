@@ -8,7 +8,6 @@ import { RESULTS, BRIDGE, MACRO_LABEL } from "@/lib/results";
 type Stage = "intro" | "quiz" | "result";
 
 const LINE_URL = process.env.NEXT_PUBLIC_LINE_URL ?? "https://line.me/";
-const SAMPLE_URL = process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL ?? "";
 
 const DEEP = "#6B53B8";
 const ON_ACCENT = "#3D3357";
@@ -160,6 +159,32 @@ function Intro({ onStart }: { onStart: () => void }) {
         が、PFC（たんぱく質・脂質・炭水化物）の傾向から見えてきます。
       </p>
 
+      <div className="mt-9 w-full animate-fadeUp [animation-delay:210ms]">
+        <p className="mb-3 text-center font-sans text-xs tracking-wide text-muted">
+          あなたはどのタイプ？
+        </p>
+        <div className="grid grid-cols-3 gap-2.5">
+          {(["C", "F", "P"] as const).map((t) => (
+            <div key={t} className="flex flex-col items-center">
+              <div className="aspect-square w-full overflow-hidden rounded-xl bg-accentSoft">
+                <img
+                  src={`/type-${t.toLowerCase()}.png`}
+                  alt={RESULTS[t].label}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.visibility =
+                      "hidden";
+                  }}
+                />
+              </div>
+              <span className="mt-2 text-center font-sans text-[10.5px] leading-tight text-ink/70">
+                {RESULTS[t].label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <button
         onClick={onStart}
         className="mt-9 inline-flex animate-fadeUp items-center gap-2 rounded-full px-8 py-4 font-sans text-base font-bold text-white shadow-lg shadow-accentDeep/20 transition hover:opacity-90 active:scale-[0.98] [animation-delay:240ms]"
@@ -294,15 +319,12 @@ function Result({
         }}
       />
 
-      <p className="mt-5 animate-fadeUp font-display text-lg text-ink/80 [animation-delay:160ms]">
-        {r.catch}
+      <p className="mt-5 animate-fadeUp font-sans text-xs tracking-wide text-muted [animation-delay:160ms]">
+        あなたの傾向（PFCの偏り）
       </p>
 
       {/* tendency bars */}
-      <div className="mt-7 animate-fadeUp rounded-2xl border border-line bg-white p-5 [animation-delay:200ms]">
-        <p className="mb-4 font-sans text-xs tracking-wide text-muted">
-          あなたの傾向（PFCの偏り）
-        </p>
+      <div className="mt-3 animate-fadeUp rounded-2xl border border-line bg-white p-5 [animation-delay:200ms]">
         <div className="flex flex-col gap-3.5">
           {bars.map((b) => (
             <div key={b.m} className="flex items-center gap-3">
@@ -380,13 +402,14 @@ function Result({
       <div className="mt-9 animate-fadeUp rounded-3xl border border-accent/40 bg-accentSoft p-6 [animation-delay:420ms]">
         <p className="font-sans text-[15px] leading-relaxed text-ink">{BRIDGE}</p>
 
-        {SAMPLE_URL && (
-          <img
-            src={SAMPLE_URL}
-            alt="3日間レポートのサンプル"
-            className="mt-5 w-full rounded-xl border border-line"
-          />
-        )}
+        <img
+          src="/sample_report.png"
+          alt="3日間レポートのサンプル"
+          className="mt-5 w-full rounded-xl border border-line"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
+        />
 
         <a
           href={LINE_URL}
