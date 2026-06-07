@@ -10,7 +10,8 @@ type Stage = "intro" | "quiz" | "result";
 const LINE_URL = process.env.NEXT_PUBLIC_LINE_URL ?? "https://line.me/";
 const SAMPLE_URL = process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL ?? "";
 
-const ON_ACCENT = "#3D3357"; // 指し色の上に乗せる文字色（読みやすい濃い紫）
+const ON_ACCENT = "#3D3357";
+const DEEP = "#6B53B8";
 
 export default function Quiz() {
   const [stage, setStage] = useState<Stage>("intro");
@@ -180,6 +181,18 @@ function QuizStep({
 }
 
 /* ---------------- Result ---------------- */
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span
+        className="h-4 w-1.5 rounded-full"
+        style={{ backgroundColor: "#D0BDFF" }}
+      />
+      <h3 className="font-display text-lg font-semibold text-ink">{children}</h3>
+    </div>
+  );
+}
+
 function Result({
   result,
   onRestart,
@@ -188,6 +201,7 @@ function Result({
   onRestart: () => void;
 }) {
   const r = RESULTS[result.type];
+  const imgSrc = `/type-${r.type.toLowerCase()}.png`;
   const bars = useMemo(
     () =>
       (["C", "F", "P"] as const).map((m) => ({
@@ -207,12 +221,23 @@ function Result({
       <h1 className="mt-2 animate-fadeUp font-display text-3xl font-bold leading-snug text-ink sm:text-4xl [animation-delay:80ms]">
         {r.label}
       </h1>
-      <p className="mt-4 animate-fadeUp font-display text-lg text-ink/80 [animation-delay:140ms]">
+
+      {/* illustration (上のほう) — user supplies /public/type-c.png 等。無ければ自動で非表示 */}
+      <img
+        src={imgSrc}
+        alt={r.label}
+        className="mx-auto mt-6 w-full max-w-xs animate-fadeUp rounded-2xl [animation-delay:120ms]"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+
+      <p className="mt-5 animate-fadeUp font-display text-lg text-ink/80 [animation-delay:160ms]">
         {r.catch}
       </p>
 
       {/* tendency bars */}
-      <div className="mt-8 animate-fadeUp rounded-2xl border border-line bg-white p-5 [animation-delay:200ms]">
+      <div className="mt-7 animate-fadeUp rounded-2xl border border-line bg-white p-5 [animation-delay:200ms]">
         <p className="mb-4 font-sans text-xs tracking-wide text-muted">
           あなたの傾向（PFCの偏り）
         </p>
@@ -235,7 +260,7 @@ function Result({
               {b.dominant && (
                 <span
                   className="shrink-0 rounded-full px-2.5 py-0.5 font-sans text-xs font-bold text-white"
-                  style={{ backgroundColor: "#6B53B8" }}
+                  style={{ backgroundColor: DEEP }}
                 >
                   多め
                 </span>
@@ -248,17 +273,49 @@ function Result({
         </p>
       </div>
 
-      {/* body */}
-      <div className="mt-7 flex flex-col gap-4 animate-fadeUp [animation-delay:260ms]">
-        {r.body.map((p, i) => (
-          <p key={i} className="font-sans text-[15px] leading-relaxed text-ink/90">
-            {p}
-          </p>
-        ))}
-      </div>
+      {/* ── 解説セクション ── */}
+      <section className="mt-9 animate-fadeUp [animation-delay:260ms]">
+        <SectionHeading>タイプの特徴</SectionHeading>
+        <p className="mt-3 font-sans text-[15px] leading-relaxed text-ink/90">
+          {r.features}
+        </p>
+      </section>
+
+      <section className="mt-8 animate-fadeUp [animation-delay:300ms]">
+        <SectionHeading>なぜ痩せにくくなるのか</SectionHeading>
+        <p className="mt-3 font-sans text-[15px] leading-relaxed text-ink/90">
+          {r.whyHard}
+        </p>
+      </section>
+
+      <section className="mt-8 animate-fadeUp [animation-delay:340ms]">
+        <SectionHeading>痩せるためのチェックポイント7</SectionHeading>
+        <ol className="mt-4 flex flex-col gap-3">
+          {r.checkpoints.map((c, i) => (
+            <li key={i} className="flex gap-3">
+              <span
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-sans text-xs font-bold"
+                style={{ backgroundColor: "#F4F0FF", color: DEEP }}
+              >
+                {i + 1}
+              </span>
+              <span className="font-sans text-[15px] leading-relaxed text-ink/90">
+                {c}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mt-8 animate-fadeUp rounded-2xl bg-accentSoft p-5 [animation-delay:380ms]">
+        <SectionHeading>あなたへのメッセージ</SectionHeading>
+        <p className="mt-3 font-sans text-[15px] leading-relaxed text-ink/90">
+          {r.message}
+        </p>
+      </section>
 
       {/* bridge + CTA */}
-      <div className="mt-9 animate-fadeUp rounded-3xl border border-accent/40 bg-accentSoft p-6 [animation-delay:320ms]">
+      <div className="mt-9 animate-fadeUp rounded-3xl border border-accent/40 bg-accentSoft p-6 [animation-delay:420ms]">
         <p className="font-sans text-[15px] leading-relaxed text-ink">{BRIDGE}</p>
 
         {SAMPLE_URL && (
@@ -274,7 +331,7 @@ function Result({
           target="_blank"
           rel="noopener noreferrer"
           className="mt-6 block rounded-full px-6 py-4 text-center font-sans text-base font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
-          style={{ backgroundColor: "#6B53B8" }}
+          style={{ backgroundColor: DEEP }}
         >
           3日間の食事アドバイス体験を受ける
         </a>
