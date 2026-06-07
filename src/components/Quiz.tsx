@@ -163,26 +163,14 @@ function Intro({ onStart }: { onStart: () => void }) {
         <p className="mb-3 text-center font-sans text-xs tracking-wide text-muted">
           あなたはどのタイプ？
         </p>
-        <div className="grid grid-cols-3 gap-2.5">
-          {(["C", "F", "P"] as const).map((t) => (
-            <div key={t} className="flex flex-col items-center">
-              <div className="aspect-square w-full overflow-hidden rounded-xl bg-accentSoft">
-                <img
-                  src={`/type-${t.toLowerCase()}.png`}
-                  alt={RESULTS[t].label}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.visibility =
-                      "hidden";
-                  }}
-                />
-              </div>
-              <span className="mt-2 text-center font-sans text-[10.5px] leading-tight text-ink/70">
-                {RESULTS[t].label}
-              </span>
-            </div>
-          ))}
-        </div>
+        <img
+          src="/types-hero.png"
+          alt="3つの痩せ方タイプ"
+          className="w-full rounded-2xl"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
+        />
       </div>
 
       <button
