@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "あなたが“摂りすぎ”ている栄養素は？｜PFC診断",
+  title: "あなたに合う痩せ方診断",
   description:
-    "10問・約60秒。タップで答えるだけ。ダイエットがうまくいかなかった本当の理由が、PFC（たんぱく質・脂質・糖質）から見えてきます。",
+    "10問・約60秒。タップで答えるだけ。あなたに合う痩せ方が、PFC（たんぱく質・脂質・糖質）の傾向から見えてきます。",
   openGraph: {
-    title: "あなたが“摂りすぎ”ている栄養素は？",
-    description: "10問・約60秒のPFC診断。",
+    title: "あなたに合う痩せ方診断",
+    description: "10問・約60秒の痩せ方タイプ診断。",
     type: "website",
   },
 };

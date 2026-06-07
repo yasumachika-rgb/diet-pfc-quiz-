@@ -3,26 +3,28 @@ import type { Macro } from "./questions";
 export type ResultContent = {
   type: Macro;
   label: string;
-  accent: string; // hex
+  accent: string; // hex（指し色に統一）
   catch: string;
   body: string[];
 };
 
+const ACCENT = "#D0BDFF";
+
 export const RESULTS: Record<Macro, ResultContent> = {
   C: {
     type: "C",
-    label: "糖質オーバー型",
-    accent: "#E7C25E",
+    label: "炭水化物好きタイプ",
+    accent: ACCENT,
     catch: "「全部我慢」しなくて、よかったんです。",
     body: [
-      "痩せたいとき、つい食事ぜんぶを減らそうとしていませんでしたか。あなたの回答でいちばん大きかったのは糖質。裏を返せば、触る場所はここ1つで十分だということです。",
+      "痩せたいとき、つい食事ぜんぶを減らそうとしていませんでしたか。あなたの回答でいちばん大きかったのは炭水化物（糖質）。裏を返せば、触る場所はここ1つで十分だということです。",
       "甘いものや主食がやめられないのは意志の弱さではなく、血糖の乱高下が「また食べたい」を呼ぶ仕組みのせい。だから根性ではなく、食べる順番と組み合わせで整えられます。",
     ],
   },
   F: {
     type: "F",
-    label: "脂質オーバー型",
-    accent: "#E0784E",
+    label: "ご褒美満喫タイプ",
+    accent: ACCENT,
     catch: "「糖質オフ」を頑張ってきた、あなたへ。",
     body: [
       "ごはんやパンを我慢してきたのに結果が出なかったとしたら、狙う場所が違ったのかもしれません。あなたの回答で大きかったのは、糖質ではなく脂質でした。",
@@ -31,8 +33,8 @@ export const RESULTS: Record<Macro, ResultContent> = {
   },
   P: {
     type: "P",
-    label: "たんぱく質オーバー／頑張りすぎ型",
-    accent: "#3E948A",
+    label: "健康意識高めタイプ",
+    accent: ACCENT,
     catch: "頑張ってきたのに痩せない、あなたへ。",
     body: [
       "プロテイン、サラダチキン、糖質オフ。あなたはきっと、誰よりちゃんとやってきた人です。それでも結果が出ないのは、努力不足ではありません。",

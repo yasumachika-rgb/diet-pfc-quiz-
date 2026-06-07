@@ -5,15 +5,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: "#FAF5EE",
-        ink: "#2E2A26",
-        teal: "#1C6E6A",
-        tealDark: "#14524F",
-        coral: "#E0784E",
-        sand: "#E7C25E",
-        protein: "#3E948A",
-        muted: "#9A9189",
-        line: "#E7DECF",
+        ink: "#545454",        // 文字
+        accent: "#D0BDFF",     // 指し色
+        accentSoft: "#F4F0FF", // 指し色の薄い背景
+        accentDeep: "#6B53B8", // 読みやすさ用の濃い紫（要所のみ）
+        muted: "#9B9B9B",
+        line: "#ECE9F2",
       },
       fontFamily: {
         display: ['"Shippori Mincho"', "serif"],

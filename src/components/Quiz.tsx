@@ -7,9 +7,10 @@ import { RESULTS, BRIDGE, MACRO_LABEL } from "@/lib/results";
 
 type Stage = "intro" | "quiz" | "result";
 
-const LINE_URL =
-  process.env.NEXT_PUBLIC_LINE_URL ?? "https://line.me/";
+const LINE_URL = process.env.NEXT_PUBLIC_LINE_URL ?? "https://line.me/";
 const SAMPLE_URL = process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL ?? "";
+
+const ON_ACCENT = "#3D3357"; // 指し色の上に乗せる文字色（読みやすい濃い紫）
 
 export default function Quiz() {
   const [stage, setStage] = useState<Stage>("intro");
@@ -29,7 +30,6 @@ export default function Quiz() {
       const r = score(next);
       setResult(r);
       setStage("result");
-      // best-effort store; never blocks the UI
       fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,29 +74,30 @@ export default function Quiz() {
 function Intro({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex flex-1 flex-col justify-center">
-      <p className="animate-fadeUp font-sans text-sm tracking-widest text-teal">
-        DIET PFC CHECK
+      <p className="animate-fadeUp font-sans text-sm tracking-widest text-accentDeep">
+        DIET TYPE CHECK
       </p>
       <h1 className="animate-fadeUp font-display text-3xl font-bold leading-snug text-ink sm:text-4xl [animation-delay:80ms]">
-        あなたが<br />
-        <span className="relative inline-block">
-          <span className="relative z-10">“摂りすぎ”ている</span>
-          <span className="absolute inset-x-0 bottom-1 z-0 h-3 bg-sand/50" />
-        </span>
+        あなたに合う
         <br />
-        栄養素は？
+        <span className="relative inline-block">
+          <span className="relative z-10">痩せ方</span>
+          <span className="absolute inset-x-0 bottom-1 z-0 h-3 bg-accent/70" />
+        </span>
+        診断
       </h1>
       <p className="mt-6 animate-fadeUp font-sans text-base leading-relaxed text-ink/80 [animation-delay:160ms]">
         10問・約60秒。タップで答えるだけ。
         <br />
         ダイエットがうまくいかなかった
         <span className="font-medium text-ink">本当の理由</span>
-        が、PFC（たんぱく質・脂質・糖質）から見えてきます。
+        が、PFC（たんぱく質・脂質・糖質）の傾向から見えてきます。
       </p>
 
       <button
         onClick={onStart}
-        className="mt-10 animate-fadeUp rounded-full bg-teal px-8 py-4 font-sans text-base font-bold text-cream shadow-lg shadow-teal/20 transition hover:bg-tealDark active:scale-[0.98] [animation-delay:240ms]"
+        className="mt-10 animate-fadeUp rounded-full bg-accent px-8 py-4 font-sans text-base font-bold shadow-lg shadow-accent/30 transition hover:bg-[#C2ABFB] active:scale-[0.98] [animation-delay:240ms]"
+        style={{ color: ON_ACCENT }}
       >
         診断をはじめる
       </button>
@@ -126,7 +127,6 @@ function QuizStep({
   const pct = Math.round(((step + 1) / total) * 100);
   return (
     <div className="flex flex-1 flex-col">
-      {/* progress */}
       <div className="mb-8">
         <div className="mb-2 flex items-center justify-between font-sans text-xs text-muted">
           <button
@@ -142,7 +142,7 @@ function QuizStep({
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
           <div
-            className="h-full rounded-full bg-teal transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -165,10 +165,10 @@ function QuizStep({
               className={[
                 "animate-fadeUp rounded-2xl border px-5 py-4 text-left font-sans text-[15px] leading-relaxed transition active:scale-[0.99]",
                 active
-                  ? "border-teal bg-teal text-cream"
-                  : "border-line bg-white/70 text-ink hover:border-teal/60 hover:bg-white",
+                  ? "border-accent bg-accent"
+                  : "border-line bg-white text-ink hover:border-accent/60 hover:bg-accentSoft",
               ].join(" ")}
-              style={{ animationDelay: `${i * 60}ms` }}
+              style={active ? { color: ON_ACCENT } : undefined}
             >
               {opt.label}
             </button>
@@ -201,10 +201,7 @@ function Result({
 
   return (
     <div className="flex flex-1 flex-col">
-      <p
-        className="animate-fadeUp font-sans text-sm tracking-widest"
-        style={{ color: r.accent }}
-      >
+      <p className="animate-fadeUp font-sans text-sm tracking-widest text-accentDeep">
         あなたのタイプは
       </p>
       <h1 className="mt-2 animate-fadeUp font-display text-3xl font-bold leading-snug text-ink sm:text-4xl [animation-delay:80ms]">
@@ -215,7 +212,7 @@ function Result({
       </p>
 
       {/* tendency bars */}
-      <div className="mt-8 animate-fadeUp rounded-2xl border border-line bg-white/70 p-5 [animation-delay:200ms]">
+      <div className="mt-8 animate-fadeUp rounded-2xl border border-line bg-white p-5 [animation-delay:200ms]">
         <p className="mb-4 font-sans text-xs tracking-wide text-muted">
           あなたの傾向（PFCの偏り）
         </p>
@@ -225,12 +222,12 @@ function Result({
               <span className="w-16 shrink-0 font-sans text-sm text-ink">
                 {b.label}
               </span>
-              <div className="h-3 flex-1 overflow-hidden rounded-full bg-cream">
+              <div className="h-3 flex-1 overflow-hidden rounded-full bg-accentSoft">
                 <div
                   className="h-full origin-left rounded-full"
                   style={{
                     width: `${Math.max(b.share, 4)}%`,
-                    backgroundColor: b.dominant ? r.accent : "#D9CFBE",
+                    backgroundColor: b.dominant ? r.accent : "#E2E0E8",
                     animation: "grow 0.8s cubic-bezier(0.22,1,0.36,1) both",
                   }}
                 />
@@ -238,9 +235,9 @@ function Result({
               {b.dominant && (
                 <span
                   className="shrink-0 rounded-full px-2.5 py-0.5 font-sans text-xs font-bold text-white"
-                  style={{ backgroundColor: r.accent }}
+                  style={{ backgroundColor: "#6B53B8" }}
                 >
-                  摂りすぎ
+                  多め
                 </span>
               )}
             </div>
@@ -261,14 +258,14 @@ function Result({
       </div>
 
       {/* bridge + CTA */}
-      <div className="mt-9 animate-fadeUp rounded-3xl bg-teal p-6 text-cream [animation-delay:320ms]">
-        <p className="font-sans text-[15px] leading-relaxed">{BRIDGE}</p>
+      <div className="mt-9 animate-fadeUp rounded-3xl border border-accent/40 bg-accentSoft p-6 [animation-delay:320ms]">
+        <p className="font-sans text-[15px] leading-relaxed text-ink">{BRIDGE}</p>
 
         {SAMPLE_URL && (
           <img
             src={SAMPLE_URL}
             alt="3日間レポートのサンプル"
-            className="mt-5 w-full rounded-xl border border-white/15"
+            className="mt-5 w-full rounded-xl border border-line"
           />
         )}
 
@@ -276,11 +273,12 @@ function Result({
           href={LINE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 block rounded-full bg-cream px-6 py-4 text-center font-sans text-base font-bold text-teal transition hover:bg-white active:scale-[0.98]"
+          className="mt-6 block rounded-full px-6 py-4 text-center font-sans text-base font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
+          style={{ backgroundColor: "#6B53B8" }}
         >
-          公式LINEで3日間レポートを受け取る
+          3日間の食事アドバイス体験を受ける
         </a>
-        <p className="mt-3 text-center font-sans text-xs text-cream/70">
+        <p className="mt-3 text-center font-sans text-xs text-ink/60">
           あなた専用のカロリー＆PFCレポートを無料でお返しします
         </p>
       </div>
