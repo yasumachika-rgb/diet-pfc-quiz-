@@ -408,7 +408,7 @@ function Result({
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = "none";
           }}
-        />
+        </a>
 
         
           href={LINE_URL}
