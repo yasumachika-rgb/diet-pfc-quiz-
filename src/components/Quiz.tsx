@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect,useMemo, useState } from "react";
 import { QUESTIONS } from "@/lib/questions";
 import { score, type ScoreResult } from "@/lib/scoring";
 import { RESULTS, BRIDGE, MACRO_LABEL } from "@/lib/results";
@@ -40,6 +40,14 @@ export default function Quiz() {
 
   const total = QUESTIONS.length;
   const q = QUESTIONS[step];
+  // 表紙に着いた瞬間、到達を1回だけ記録する
+  useEffect(() => {
+    fetch("/api/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ utm_content: getUtmContent() }),
+    }).catch(() => {});
+  }, []);
 
   function choose(optIdx: number) {
     const next = { ...answers, [q.id]: optIdx };
