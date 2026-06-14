@@ -26,6 +26,12 @@ const MACRO_COLOR: Record<"P" | "F" | "C", string> = {
 };
 const BAR_ORDER = ["P", "F", "C"] as const; // たんぱく質→脂質→炭水化物
 
+/* ===== 広告の印（utm_content）をURLから読み取る ===== */
+function getUtmContent(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("utm_content");
+}
+
 export default function Quiz() {
   const [stage, setStage] = useState<Stage>("intro");
   const [step, setStep] = useState(0);
@@ -47,7 +53,12 @@ export default function Quiz() {
       fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: next, scores: r.scores, type: r.type }),
+        body: JSON.stringify({
+          answers: next,
+          scores: r.scores,
+          type: r.type,
+          utm_content: getUtmContent(),
+        }),
       }).catch(() => {});
     }
   }
@@ -399,7 +410,7 @@ function Result({
           }}
         />
 
-        <a
+        
           href={LINE_URL}
           target="_blank"
           rel="noopener noreferrer"
