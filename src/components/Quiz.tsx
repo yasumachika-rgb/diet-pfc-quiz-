@@ -419,7 +419,7 @@ function Result({
           }}
         />
 
-        
+        <a
           href={LINE_URL}
           target="_blank"
           rel="noopener noreferrer"
