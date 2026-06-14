@@ -408,9 +408,9 @@ function Result({
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = "none";
           }}
-        </a>
+        />
 
-        
+        <a
           href={LINE_URL}
           target="_blank"
           rel="noopener noreferrer"
